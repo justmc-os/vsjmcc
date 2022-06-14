@@ -21,7 +21,7 @@
     "color": "#3A6BF2",
     "theme": "dark"
   },
-  "license": "SEE LICENSE IN LISENCE",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
