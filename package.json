@@ -2,7 +2,7 @@
   "name": "vsjmcc",
   "publisher": "rqbik",
   "displayName": "jmcc: Visual Studio Code",
-  "version": "1.5.1",
+  "version": "1.5.3",
   "description": "VSCode support for JustCode",
   "author": "rqbik",
   "icon": "icon.png",
@@ -18,7 +18,7 @@
     "JustCode"
   ],
   "galleryBanner": {
-    "color": "#3A6BF2",
+    "color": "#0F1D44",
     "theme": "dark"
   },
   "license": "SEE LICENSE IN LICENSE",
@@ -57,7 +57,7 @@
         "configuration": "./jc.language-configuration.json",
         "icon": {
           "light": "./icon.png",
-          "dark": "./icon.png"
+          "dark": "./icon-dark.png"
         }
       }
     ],
