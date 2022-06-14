@@ -1,14 +1,27 @@
 {
   "name": "vsjmcc",
   "publisher": "rqbik",
-  "displayName": "vscode-jmcc",
-  "version": "1.5.0",
+  "displayName": "jmcc: Visual Studio Code",
+  "version": "1.5.1",
   "description": "VSCode support for JustCode",
   "author": "rqbik",
-  "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/justmc-c/vsjmcc"
+  },
+  "bugs": {
+    "url": "https://github.com/justmc-c/vsjmcc/issues"
+  },
+  "homepage": "https://github.com/justmc-c/vsjmcc/blob/main/README.md",
   "keywords": [
     "JustCode"
   ],
+  "galleryBanner": {
+    "color": "#3A6BF2",
+    "theme": "dark"
+  },
+  "license": "SEE LICENSE IN LISENCE",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
