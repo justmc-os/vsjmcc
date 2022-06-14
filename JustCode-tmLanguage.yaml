@@ -33,8 +33,9 @@ repository:
     end: (?=\S)
 
   keyword:
-    name: keyword.control.export.ts
     match: (^|\s)(event|function|process|inline|var|game|save|import|else|if|break)([^\w`"']+|$)
+    captures:
+      "2": { name: keyword.control.export.ts }
 
   declaration:
     patterns:
