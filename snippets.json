@@ -1,0 +1,17 @@
+{
+  "Event statement": {
+    "prefix": "event",
+    "body": ["event<${1:player_join}> {", "$2", "}"],
+    "description": "Creates event statement"
+  },
+  "Function statement": {
+    "prefix": "function",
+    "body": ["function ${1:name}(${2:param}) {", "$3", "}"],
+    "description": "Creates function statement"
+  },
+  "Process statement": {
+    "prefix": "process",
+    "body": ["process ${1:name}(${2:param}) {", "$3", "}"],
+    "description": "Creates process statement"
+  }
+}

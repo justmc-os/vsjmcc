@@ -1,0 +1,203 @@
+---
+name: JustCode
+scopeName: source.jc
+fileTypes: [jc]
+uuid: ef98eb90-bf9b-11e4-bb52-0800200c9a67
+
+variables:
+  identifier: "`?[_$%[:alpha:]][_$%[:alnum:]]*`?"
+  number: |-
+    (?<!\$)(?:
+      (?:\b[0-9][0-9_]*(\.)[0-9][0-9_]*(n)?\b)|                      # 1.1
+      (?:\b[0-9][0-9_]*(\.)(n)?\B)|                                  # 1.
+      (?:\B(\.)[0-9][0-9_]*(n)?\b)|                                  # .1
+      (?:\b[0-9][0-9_]*(n)?\b(?!\.))                                 # 1
+    )(?!\$)
+
+patterns:
+  - include: "#statements"
+
+repository:
+  statements:
+    patterns:
+      - include: "#if-statement"
+      - include: "#declaration"
+      - include: "#keyword"
+      - include: "#expression"
+
+  if-statement:
+    begin: (if)?(\s+not)?\s+\(
+    beginCaptures:
+      "1": { name: keyword.control.export.ts }
+      "2": { name: keyword.control.export.ts }
+    end: (?=\S)
+
+  keyword:
+    name: keyword.control.export.ts
+    match: (^|\s)(event|function|process|inline|var|game|save|import|else|if|break)([^\w`"']+|$)
+
+  declaration:
+    patterns:
+      - include: "#variable-declaration"
+      - include: "#function-declaration"
+      - include: "#import-declaration"
+
+  variable-declaration:
+    begin: ((game|save|inline)\s+)?(var)\s+({{identifier}})
+    beginCaptures:
+      "1": { name: keyword.control.export.ts }
+      "3": { name: keyword.control.export.ts }
+      "4": { name: meta.definition.variable.ts variable.other.readwrite.ts }
+    end: (?=\S)
+
+  function-declaration:
+    begin: (function|process)\s+({{identifier}})
+    beginCaptures:
+      "1": { name: keyword.control.export.ts }
+      "2": { name: entity.name.function.ts meta.function-call.ts }
+    end: (?=\S)
+
+  expression:
+    patterns:
+      - include: "#comment"
+      - include: "#object-reference"
+      - include: "#target-reference"
+      - include: "#function-call"
+      - include: "#operator"
+      - include: "#identifier"
+      - include: "#number"
+      - include: "#string"
+
+  object-reference:
+    begin: "({{identifier}})::"
+    beginCaptures:
+      "1": { name: constant.character.escape.ts }
+    end: (?=\S)
+
+  target-reference:
+    begin: <({{identifier}})>
+    beginCaptures:
+      "1": { name: variable.other.constant.ts }
+    end: (?=\S)
+
+  function-call:
+    begin: ({{identifier}})(<({{identifier}})?>?)?\(
+    beginCaptures:
+      "1": { name: entity.name.function.ts meta.function-call.ts }
+      "3": { name: variable.other.constant.ts }
+    end: \)
+    patterns:
+      - include: "#function-parameters"
+      - include: "#expression"
+
+  function-parameters:
+    name: keyword.operator.assignment.ts meta.var.expr.ts
+    match: ({{identifier}}\s*=)
+
+  operator:
+    name: keyword.operator.assignment.ts meta.var.expr.ts
+    match: (=)|(\+)|(\-)|(\*)|(%)|(/)
+
+  identifier:
+    name: meta.definition.variable.ts variable.other.readwrite.ts
+    match: "{{identifier}}"
+
+  number:
+    patterns:
+      - match: |-
+          (?x)
+          {{number}}
+        captures:
+          "0": { name: constant.numeric.decimal.ts }
+          "1": { name: meta.delimiter.decimal.period.ts }
+          "2": { name: storage.type.numeric.bigint.ts }
+          "3": { name: meta.delimiter.decimal.period.ts }
+          "4": { name: storage.type.numeric.bigint.ts }
+          "5": { name: meta.delimiter.decimal.period.ts }
+          "6": { name: storage.type.numeric.bigint.ts }
+          "7": { name: storage.type.numeric.bigint.ts }
+          "8": { name: meta.delimiter.decimal.period.ts }
+          "9": { name: storage.type.numeric.bigint.ts }
+          "10": { name: meta.delimiter.decimal.period.ts }
+          "11": { name: storage.type.numeric.bigint.ts }
+          "12": { name: meta.delimiter.decimal.period.ts }
+          "13": { name: storage.type.numeric.bigint.ts }
+          "14": { name: storage.type.numeric.bigint.ts }
+
+  string:
+    patterns:
+      - include: "#qstring-single"
+      - include: "#qstring-double"
+
+  qstring-double:
+    name: string.quoted.double.ts
+    begin: '"'
+    beginCaptures:
+      "0": { name: punctuation.definition.string.begin.ts }
+    end: '(")|((?:[^\\\n])$)'
+    endCaptures:
+      "1": { name: punctuation.definition.string.end.ts }
+      "2": { name: invalid.illegal.newline.ts }
+    patterns:
+      - include: "#dollar-reference"
+      - include: "#dollar-expression"
+
+  qstring-single:
+    name: string.quoted.single.ts
+    begin: "'"
+    beginCaptures:
+      "0": { name: punctuation.definition.string.begin.ts }
+    end: (\')|((?:[^\\\n])$)
+    endCaptures:
+      "1": { name: punctuation.definition.string.end.ts }
+      "2": { name: invalid.illegal.newline.ts }
+    patterns:
+      - include: "#dollar-reference"
+      - include: "#dollar-expression"
+
+  dollar-reference:
+    name: meta.template.expression.ts
+    begin: (\$)(?!\{)
+    beginCaptures:
+      "0": { name: punctuation.definition.template-expression.begin.ts }
+    end: ()(?=[^_$%[:alnum:]`])
+    endCaptures:
+      "0": { name: punctuation.definition.template-expression.end.ts }
+    patterns:
+      - include: "#expression"
+
+  dollar-expression:
+    name: meta.template.expression.ts
+    begin: \$\{
+    beginCaptures:
+      "0": { name: punctuation.definition.template-expression.begin.ts }
+    end: \}
+    endCaptures:
+      "0": { name: punctuation.definition.template-expression.end.ts }
+    patterns:
+      - include: "#expression"
+    contentName: meta.embedded.line.ts
+
+  comment:
+    patterns:
+      - name: comment.block.documentation.ts
+        begin: /\*\*(?!/)
+        beginCaptures:
+          "0": { name: punctuation.definition.comment.ts }
+        end: \*/
+        endCaptures:
+          "0": { name: punctuation.definition.comment.ts }
+      - name: comment.block.ts
+        begin: (/\*)(?:\s*(?=\s|(\*/)))?
+        beginCaptures:
+          "1": { name: punctuation.definition.comment.ts }
+        end: \*/
+        endCaptures:
+          "0": { name: punctuation.definition.comment.ts }
+      - begin: (^[ \t]+)?((//)(?:\s*(?=\s|$))?)
+        beginCaptures:
+          "1": { name: punctuation.whitespace.comment.leading.ts }
+          "2": { name: comment.line.double-slash.ts }
+          "3": { name: punctuation.definition.comment.ts }
+        end: (?=$)
+        contentName: comment.line.double-slash.ts
