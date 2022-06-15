@@ -5,7 +5,9 @@ fileTypes: [jc]
 uuid: ef98eb90-bf9b-11e4-bb52-0800200c9a67
 
 variables:
-  identifier: "`?[_$%[:alpha:]][_$%[:alnum:]]*`?"
+  identifier: "(?:[_$[:alpha:]][_$[:alnum:]]*|%[_$%[:alnum:]]+)"
+  identifierStart: "(?<![_$%[:alnum:]])"
+  identifierEnd: "(?![_$%[:alnum:]])"
   number: |-
     (?<!\$)(?:
       (?:\b[0-9][0-9_]*(\.)[0-9][0-9_]*(n)?\b)|                      # 1.1
@@ -27,20 +29,20 @@ repository:
       - include: "#expression"
 
   if-statement:
-    begin: (if)?(\s+not)?\s+\(
+    begin: \s*(if)\s+(not)?\s+\(
     beginCaptures:
       "1": { name: keyword.control.export.ts }
       "2": { name: keyword.control.export.ts }
     end: (?=\S)
 
   event-statement:
-    match: (event)<({{identifier}})>
+    match: \s*(event)<({{identifier}})?>?
     captures:
       "1": { name: keyword.control.export.ts }
       "2": { name: variable.other.constant.ts }
 
   keyword:
-    match: (^|\s)(event|function|process|inline|var|game|save|import|else|if|break)([^\w`"'<>{}()]+|$)
+    match: \s*(^|[^\w%_$])(event|function|process|inline|var|game|save|import|else|if|break)([^\w]|$)
     captures:
       "2": { name: keyword.control.export.ts }
 
@@ -51,7 +53,7 @@ repository:
       - include: "#import-declaration"
 
   variable-declaration:
-    begin: ((game|save|inline)\s+)?(var)\s+({{identifier}})
+    begin: \s*((game|save|inline)\s+)?(var)\s+({{identifier}})?
     beginCaptures:
       "1": { name: keyword.control.export.ts }
       "3": { name: keyword.control.export.ts }
@@ -59,7 +61,7 @@ repository:
     end: (?=\S)
 
   function-declaration:
-    begin: (function|process)\s+({{identifier}})
+    begin: \s*(function|process)\s+({{identifier}})
     beginCaptures:
       "1": { name: keyword.control.export.ts }
       "2": { name: entity.name.function.ts meta.function-call.ts }
@@ -71,8 +73,10 @@ repository:
       - include: "#object-reference"
       - include: "#target-reference"
       - include: "#function-call"
-      - include: "#operator"
+      - include: "#quoted-identifier"
+      - include: "#boolean"
       - include: "#identifier"
+      - include: "#operator"
       - include: "#number"
       - include: "#string"
 
@@ -106,9 +110,24 @@ repository:
     name: keyword.operator.assignment.ts meta.var.expr.ts
     match: (=)|(\+)|(\-)|(\*)|(%)|(/)
 
+  quoted-identifier:
+    name: meta.definition.variable.ts variable.other.readwrite.ts
+    begin: "`[^`]"
+    end: "`"
+    patterns:
+      - include: "#dollar-reference"
+      - include: "#dollar-expression"
+
   identifier:
     name: meta.definition.variable.ts variable.other.readwrite.ts
     match: "{{identifier}}"
+
+  boolean:
+    patterns:
+      - name: constant.language.boolean.true.ts
+        match: "{{identifierStart}}true{{identifierEnd}}"
+      - name: constant.language.boolean.false.ts
+        match: "{{identifierStart}}false{{identifierEnd}}"
 
   number:
     patterns:
